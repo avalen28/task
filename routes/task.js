@@ -1,10 +1,10 @@
 const router = require('express').Router();
 
-// @desc    Index page for the API
+// @desc    Test endpoint for the API
 // @route   GET /
 // @access  Public
-router.get('/', async (req, res) => {
-  res.send('This is the Walk Away home. Add an endpoint to see data.');
+router.get('/test', async (req, res) => {
+  res.json({ message: 'This is a test endpoint for the task manager project' });
 });
 
 module.exports = router;
