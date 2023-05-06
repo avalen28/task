@@ -22,7 +22,7 @@ const getAllTasks = (req, res) => {
 // Get all pending tasks
 const getAllPendingTasks = (req, res) => {
   pool.query(
-    'SELECT * FROM tasks WHERE is_completed = false ORDER BY deadline',
+    'SELECT * FROM tasks WHERE is_completed = false ORDER BY deadline DESC',
     (error, results) => {
       if (error) {
         throw error;
@@ -53,7 +53,7 @@ const createTask = (req, res) => {
     title, description, deadline, isCompleted,
   } = req.body;
 
-  const formattedDeadline = new Date(deadline).toGMTString();
+  const formattedDeadline = new Date(deadline);
   pool.query(
     'INSERT INTO tasks (title, description, deadline, is_completed) VALUES ($1, $2, $3, $4)',
     [title, description, formattedDeadline, isCompleted],
@@ -72,7 +72,7 @@ const updateTask = (req, res) => {
   const {
     title, description, deadline, isCompleted,
   } = req.body;
-  const formattedDeadline = new Date(deadline).toGMTString();
+  const formattedDeadline = new Date(deadline);
   pool.query(
     'UPDATE tasks SET title = $1, description = $2, deadline = $3, is_completed = $4  WHERE id = $5',
     [title, description, formattedDeadline, isCompleted, taskId],
