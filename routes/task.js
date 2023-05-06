@@ -23,4 +23,9 @@ router.post('/create', db.createTask);
 // @access  Public
 router.put('/edit/:taskId', db.updateTask);
 
+// @desc    Delete a Task
+// @route   DELETE /tasks/delete/:taskId
+// @access  Public
+router.delete('/delete/:taskId', db.deleteTask);
+
 module.exports = router;

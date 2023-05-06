@@ -47,13 +47,26 @@ const updateTask = (req, res) => {
   pool.query(
     'UPDATE tasks SET title = $1, description = $2, deadline = $3, is_completed = $4  WHERE id = $5',
     [title, description, deadline, isCompleted, taskId],
-    (error, results) => {
+    (error) => {
       if (error) {
         throw error;
       }
-      res.status(200).send(`User modified with ID: ${taskId}`);
+      res.status(200).send(`Task modified with ID: ${taskId}`);
     },
   );
 };
 
-module.exports = { createTask, getAllTasks, updateTask };
+// Delete a task
+const deleteTask = (req, res) => {
+  const taskId = parseInt(req.params.taskId, 10);
+  pool.query('DELETE FROM tasks WHERE id = $1', [taskId], (error) => {
+    if (error) {
+      throw error;
+    }
+    res.status(200).send(`Task deleted with ID: ${taskId}`);
+  });
+};
+
+module.exports = {
+  createTask, getAllTasks, updateTask, deleteTask,
+};
