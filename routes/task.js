@@ -18,4 +18,9 @@ router.get('/all', db.getAllTasks);
 // @access  Public
 router.post('/create', db.createTask);
 
+// @desc    Update new Task
+// @route   PUT /tasks/edit/:taskId
+// @access  Public
+router.put('/edit/:taskId', db.updateTask);
+
 module.exports = router;
