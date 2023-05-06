@@ -19,6 +19,19 @@ const getAllTasks = (req, res) => {
   });
 };
 
+// Get all pending tasks
+const getAllPendingTasks = (req, res) => {
+  pool.query(
+    'SELECT * FROM tasks WHERE is_completed = false ORDER BY deadline',
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      res.status(200).json(results.rows);
+    },
+  );
+};
+
 // Get a single task
 const getTaskById = (req, res) => {
   const taskId = parseInt(req.params.taskId, 10);
@@ -59,9 +72,10 @@ const updateTask = (req, res) => {
   const {
     title, description, deadline, isCompleted,
   } = req.body;
+  const formattedDeadline = new Date(deadline).toGMTString();
   pool.query(
     'UPDATE tasks SET title = $1, description = $2, deadline = $3, is_completed = $4  WHERE id = $5',
-    [title, description, deadline, isCompleted, taskId],
+    [title, description, formattedDeadline, isCompleted, taskId],
     (error) => {
       if (error) {
         throw error;
@@ -83,5 +97,5 @@ const deleteTask = (req, res) => {
 };
 
 module.exports = {
-  createTask, getAllTasks, getTaskById, updateTask, deleteTask,
+  createTask, getAllTasks, getAllPendingTasks, getTaskById, updateTask, deleteTask,
 };

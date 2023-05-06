@@ -13,6 +13,11 @@ router.get('/test', async (req, res) => {
 // @access  Public
 router.get('/all', db.getAllTasks);
 
+// @desc    Get all pending tasks sorted by deadline
+// @route   GET /tasks/pending
+// @access  Public
+router.get('/pending', db.getAllPendingTasks);
+
 // @desc    Get a single Task
 // @route   GET /tasks/:taskId
 // @access  Public
