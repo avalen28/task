@@ -13,6 +13,11 @@ router.get('/test', async (req, res) => {
 // @access  Public
 router.get('/all', db.getAllTasks);
 
+// @desc    Get a single Task
+// @route   GET /tasks/:taskId
+// @access  Public
+router.get('/:taskId', db.getTaskById);
+
 // @desc    Create new Task
 // @route   POST /tasks/create
 // @access  Public

@@ -19,6 +19,21 @@ const getAllTasks = (req, res) => {
   });
 };
 
+// Get a single task
+const getTaskById = (req, res) => {
+  const taskId = parseInt(req.params.taskId, 10);
+  pool.query(
+    'SELECT * FROM tasks WHERE id = $1',
+    [taskId],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      res.status(200).json(results.rows);
+    },
+  );
+};
+
 // Create a new task
 const createTask = (req, res) => {
   const {
@@ -68,5 +83,5 @@ const deleteTask = (req, res) => {
 };
 
 module.exports = {
-  createTask, getAllTasks, updateTask, deleteTask,
+  createTask, getAllTasks, getTaskById, updateTask, deleteTask,
 };
