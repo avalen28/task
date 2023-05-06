@@ -9,7 +9,17 @@ const pool = new Pool({
   port: process.env.PORT_DB,
 });
 
-// Las tareas deben tener un título, una descripción, una fecha de vencimiento y un estado
+// Get all tasks
+const getAllTasks = (req, res) => {
+  pool.query('SELECT * FROM tasks ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error;
+    }
+    res.status(200).json(results.rows);
+  });
+};
+
+// Create a new task
 const createTask = (req, res) => {
   const {
     title, description, deadline, isCompleted,
@@ -28,4 +38,4 @@ const createTask = (req, res) => {
   );
 };
 
-module.exports = { createTask };
+module.exports = { createTask, getAllTasks };

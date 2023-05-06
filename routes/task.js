@@ -8,6 +8,11 @@ router.get('/test', async (req, res) => {
   res.json({ message: 'This is a test endpoint for the task manager project' });
 });
 
+// @desc    Get all Tasks
+// @route   GET /tasks/all
+// @access  Public
+router.get('/all', db.getAllTasks);
+
 // @desc    Create new Task
 // @route   POST /tasks/create
 // @access  Public

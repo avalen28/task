@@ -11,4 +11,5 @@ This is a Rest API for a task manager app build with ExpressJS and PostgreSQL.
 | Action                                       | Method | Endpoint                           | Req.body                                                                      | Private/Public  |
 | -------------------------------------------- | ------ | ---------------------------------- | ----------------------------------------------------------------------------- | --------------- |
 | Test endpoint           | GET   | /tasks/test                       |                                      | Public          |
+| Get all tasks           | GET   | /tasks/all                       |                                     | Public          |
 | Create task           | POST   | /tasks/create                       | { title, description, deadline, isCompleted }                                     | Public          |
