@@ -37,12 +37,21 @@ const getAllPendingTasks = (req, res) => {
 // Get a single task
 const getTaskById = (req, res) => {
   const taskId = parseInt(req.params.taskId, 10);
+  if (Number.isNaN(taskId)) {
+    res.status(400).json({ message: 'Please provide a valid task ID' });
+    return;
+  }
   pool.query(
     'SELECT * FROM tasks WHERE id = $1',
     [taskId],
     (error, results) => {
       if (error) {
+        res.status(500).json({ message: 'Internal server error' });
         throw error;
+      }
+      if (results.rows.length === 0) {
+        res.status(200).json({ message: 'No task found with the provided ID' });
+        return;
       }
       res.status(200).json(results.rows);
     },
