@@ -13,6 +13,7 @@ const pool = new Pool({
 const getAllTasks = (req, res) => {
   pool.query('SELECT * FROM tasks ORDER BY id ASC', (error, results) => {
     if (error) {
+      res.status(500).json({ message: 'Internal server error' });
       throw error;
     }
     res.status(200).json(results.rows);
