@@ -26,6 +26,7 @@ const getAllPendingTasks = (req, res) => {
     'SELECT * FROM tasks WHERE is_completed = false ORDER BY deadline DESC',
     (error, results) => {
       if (error) {
+        res.status(500).json({ message: 'Internal server error' });
         throw error;
       }
       res.status(200).json(results.rows);
