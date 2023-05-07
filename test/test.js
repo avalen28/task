@@ -44,3 +44,48 @@ describe('GET /tasks/pending', () => {
     }
   });
 });
+
+describe('GET /tasks/:taskId', () => {
+  it('returns an error 400 with a json message', async () => {
+    const expectedMessage = { message: 'Please provide a valid task ID' };
+    // Act
+    let response;
+    try {
+      response = await axios.get(`${apiUrl}/invalidID`);
+    } catch (error) {
+      response = error.response;
+    }
+    // Assert
+    expectResponseStatus(response.status, 400);
+    expect(response.data).to.be.an('object');
+    expect(response.data).to.deep.equal(expectedMessage);
+  });
+  it('returns a status 200 with a json message no found style', async () => {
+    const expectedMessage = { message: 'No task found with the provided ID' };
+    // Act
+    let response;
+    try {
+      response = await axios.get(`${apiUrl}/9999`);
+    } catch (error) {
+      response = error.response;
+    }
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data).to.be.an('object');
+    expect(response.data).to.deep.equal(expectedMessage);
+  });
+  it('returns a status 200 with a single object - task json', async () => {
+    const taskId = 1;
+    // Act
+    let response;
+    try {
+      response = await axios.get(`${apiUrl}/${taskId}`);
+    } catch (error) {
+      response = error.response;
+    }
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data[0]).to.be.an('object');
+    expect(response.data[0].id).to.deep.equal(taskId);
+  });
+});
