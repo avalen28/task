@@ -39,7 +39,9 @@ describe('GET /tasks/pending', () => {
     expectResponseStatus(response.status, 200);
     expect(response.data).to.be.an('array');
     if (response.data.length > 0) {
-      const pendingTasks = response.data.filter((task) => task.is_completed === false);
+      const pendingTasks = response.data.filter(
+        (task) => task.is_completed === false,
+      );
       expect(pendingTasks.length).equal(response.data.length);
     }
   });
@@ -47,44 +49,41 @@ describe('GET /tasks/pending', () => {
 
 describe('GET /tasks/:taskId', () => {
   it('returns an error 400 with a json message', async () => {
+    // Setup
     const expectedMessage = { message: 'Please provide a valid task ID' };
     // Act
-    let response;
+    let errorResponse;
     try {
-      response = await axios.get(`${apiUrl}/invalidID`);
+      await axios.get(`${apiUrl}/invalidID`);
     } catch (error) {
-      response = error.response;
+      errorResponse = error.response;
     }
     // Assert
-    expectResponseStatus(response.status, 400);
-    expect(response.data).to.be.an('object');
-    expect(response.data).to.deep.equal(expectedMessage);
+    expectResponseStatus(errorResponse.status, 400);
+    expect(errorResponse.data).to.be.an('object');
+    expect(errorResponse.data).to.deep.equal(expectedMessage);
   });
-  it('returns a status 200 with a json message no found style', async () => {
+
+  it('returns a status 200 with a json message not found task', async () => {
+    // Setup
     const expectedMessage = { message: 'No task found with the provided ID' };
     // Act
-    let response;
-    try {
-      response = await axios.get(`${apiUrl}/9999`);
-    } catch (error) {
-      response = error.response;
-    }
+    const response = await axios.get(`${apiUrl}/9999`);
     // Assert
     expectResponseStatus(response.status, 200);
     expect(response.data).to.be.an('object');
     expect(response.data).to.deep.equal(expectedMessage);
   });
+
   it('returns a status 200 with a single object - task json', async () => {
+    // Setup
     const taskId = 1;
     // Act
-    let response;
-    try {
-      response = await axios.get(`${apiUrl}/${taskId}`);
-    } catch (error) {
-      response = error.response;
-    }
+    const response = await axios.get(`${apiUrl}/${taskId}`);
     // Assert
     expectResponseStatus(response.status, 200);
+    expect(response.data).to.be.an('array');
+    expect(response.data.length).equal(1);
     expect(response.data[0]).to.be.an('object');
     expect(response.data[0].id).to.deep.equal(taskId);
   });
