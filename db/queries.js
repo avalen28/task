@@ -85,16 +85,31 @@ const createTask = (req, res) => {
 // Update a task
 const updateTask = (req, res) => {
   const taskId = parseInt(req.params.taskId, 10);
+  if (Number.isNaN(taskId)) {
+    res.status(400).json({ message: 'Please provide a valid task ID' });
+    return;
+  }
   const {
     title, description, deadline, isCompleted,
   } = req.body;
+  if (!reqBodyFielsAreValid(title, description, deadline, isCompleted)) {
+    res.status(400).json({ message: 'Please check your fields' });
+    return;
+  }
   const formattedDeadline = new Date(deadline);
   pool.query(
     'UPDATE tasks SET title = $1, description = $2, deadline = $3, is_completed = $4  WHERE id = $5',
     [title, description, formattedDeadline, isCompleted, taskId],
-    (error) => {
+    (error, results) => {
       if (error) {
+        res.status(500).json({ message: 'Internal server error' });
         throw error;
+      }
+      if (results.rows.length === 0) {
+        res
+          .status(200)
+          .json({ message: 'No task found with the provided ID' });
+        return;
       }
       res.status(200).send(`Task modified with ID: ${taskId}`);
     },
