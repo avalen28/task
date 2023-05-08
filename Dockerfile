@@ -2,7 +2,7 @@
 FROM node:14-alpine
 
 # Set the working directory
-WORKDIR /task-container
+WORKDIR /task-container-app
 
 # Copy the package files to the working directory
 COPY package*.json ./
