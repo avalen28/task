@@ -5,7 +5,11 @@ const axios = require('axios');
 const { describe, it } = mocha;
 const { expect } = chai;
 
-const { apiUrl, expectResponseStatus } = require('./testUtils');
+const {
+  apiUrl,
+  expectResponseStatus,
+  validateRequestBody,
+} = require('./testUtils');
 
 describe('GET /tasks/test', () => {
   it('returns a json with a message', async () => {
@@ -87,170 +91,134 @@ describe('GET /tasks/:taskId', () => {
     expect(response.data[0]).to.be.an('object');
     expect(response.data[0].id).to.deep.equal(taskId);
   });
+});
 
-  describe('POST /tasks/create', () => {
-    it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
-      // Setup
-      const expectedMessage = { message: 'Please check your fields' };
-      const reqBody = {
-        title: 'test',
-        description: 'test description',
-        deadline: 'false',
-        isCompleted: false,
-      };
-      // Act
-      let errorResponse;
-      try {
-        await axios.post(`${apiUrl}/create`, reqBody);
-      } catch (error) {
-        errorResponse = error.response;
-      }
-      // Assert
-      expectResponseStatus(errorResponse.status, 400);
-      expect(errorResponse.data).to.be.an('object');
-      expect(errorResponse.data).to.deep.equal(expectedMessage);
-    });
-    it('returns a status 201 with a json message', async () => {
-      // Setup
-      const reqBody = {
-        title: 'test',
-        description: 'test description',
-        deadline: '2027-06-03',
-        isCompleted: false,
-      };
-      const expectedMessage = { message: '1 tasks added to DB' };
-      // Act
-      const response = await axios.post(`${apiUrl}/create`, reqBody);
-      // Assert
-      expectResponseStatus(response.status, 201);
-      expect(response.data).to.deep.equal(expectedMessage);
-    });
+describe('POST /tasks/create', () => {
+  it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
+    validateRequestBody('post');
   });
+  it('returns a status 201 with a json message', async () => {
+    // Setup
+    const reqBody = {
+      title: 'test',
+      description: 'test description',
+      deadline: '2027-06-03',
+      isCompleted: false,
+    };
+    const expectedMessage = { message: '1 tasks added to DB' };
+    // Act
+    const response = await axios.post(`${apiUrl}/create`, reqBody);
+    // Assert
+    expectResponseStatus(response.status, 201);
+    expect(response.data).to.deep.equal(expectedMessage);
+  });
+});
 
-  describe('PUT /tasks/edit/:taskId', () => {
-    it('returns an error 400 with a json message when the task id is not a number', async () => {
-      // Setup
-      const expectedMessage = { message: 'Please provide a valid task ID' };
-      // Act
-      let errorResponse;
-      try {
-        await axios.get(`${apiUrl}/invalidID`);
-      } catch (error) {
-        errorResponse = error.response;
-      }
-      // Assert
-      expectResponseStatus(errorResponse.status, 400);
-      expect(errorResponse.data).to.be.an('object');
-      expect(errorResponse.data).to.deep.equal(expectedMessage);
-    });
-    it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
-      // Setup
-      const expectedMessage = { message: 'Please check your fields' };
-      const reqBody = {
-        title: 'test',
-        description: 'test description',
-        deadline: 'false',
-        isCompleted: false,
-      };
-      const taskIdTest = 1;
-      // Act
-      let errorResponse;
-      try {
-        await axios.put(`${apiUrl}/edit/${taskIdTest}`, reqBody);
-      } catch (error) {
-        errorResponse = error.response;
-      }
-      // Assert
-      expectResponseStatus(errorResponse.status, 400);
-      expect(errorResponse.data).to.be.an('object');
-      expect(errorResponse.data).to.deep.equal(expectedMessage);
-    });
-    it('returns a status 200 with a json message not found task', async () => {
-      // Setup
-      const expectedMessage = {
-        message: 'No task found with the provided ID',
-      };
-      const reqBody = {
-        title: 'test',
-        description: 'test description',
-        deadline: '2023-05-08',
-        isCompleted: false,
-      };
-      // Act
-      const response = await axios.put(`${apiUrl}/edit/9999`, reqBody);
-      // Assert
-      expectResponseStatus(response.status, 200);
-      expect(response.data).to.be.an('object');
-      expect(response.data).to.deep.equal(expectedMessage);
-    });
-    it('returns a status 200 with a json message with task confirmed', async () => {
-      // Setup
-      const taskIdTest = 1;
-      const confirmMessage = {
-        message: `Task modified with ID: ${taskIdTest}`,
-      };
-      const reqBody = {
-        title: 'test',
-        description: 'test description',
-        deadline: '2023-05-08',
-        isCompleted: false,
-      };
-      // Act
-      const task = await axios.get(`${apiUrl}/${taskIdTest}`);
-      const response = await axios.put(`${apiUrl}/edit/${taskIdTest}`, reqBody);
-      const updatedTask = await axios.get(`${apiUrl}/${taskIdTest}`);
-      // Assert
-      expectResponseStatus(response.status, 200);
-      expect(response.data).to.deep.equal(confirmMessage);
-      expect(task).to.not.deep.equal(updatedTask);
-    });
+describe('PUT /tasks/edit/:taskId', () => {
+  it('returns an error 400 with a json message when the task id is not a number', async () => {
+    // Setup
+    const expectedMessage = { message: 'Please provide a valid task ID' };
+    // Act
+    let errorResponse;
+    try {
+      await axios.get(`${apiUrl}/invalidID`);
+    } catch (error) {
+      errorResponse = error.response;
+    }
+    // Assert
+    expectResponseStatus(errorResponse.status, 400);
+    expect(errorResponse.data).to.be.an('object');
+    expect(errorResponse.data).to.deep.equal(expectedMessage);
   });
-  describe('DELETE /tasks/delete/:taskId', async () => {
-    it('returns an error 400 with a json message when the task id is not a number', async () => {
-      // Setup
-      const expectedMessage = { message: 'Please provide a valid task ID' };
+  it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
+    validateRequestBody('put');
+  });
+  it('returns a status 200 with a json message not found task', async () => {
+    // Setup
+    const expectedMessage = {
+      message: 'No task found with the provided ID',
+    };
+    const reqBody = {
+      title: 'test',
+      description: 'test description',
+      deadline: '2023-05-08',
+      isCompleted: false,
+    };
       // Act
-      let errorResponse;
-      try {
-        await axios.delete(`${apiUrl}/delete/invalidID`);
-      } catch (error) {
-        errorResponse = error.response;
-      }
-      // Assert
-      expectResponseStatus(errorResponse.status, 400);
-      expect(errorResponse.data).to.be.an('object');
-      expect(errorResponse.data).to.deep.equal(expectedMessage);
-    });
-    it('returns a status 200 with a json message not found task', async () => {
-      // Setup
-      const expectedMessage = {
-        message: 'No task found with the provided ID',
-      };
+    const response = await axios.put(`${apiUrl}/edit/9999`, reqBody);
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data).to.be.an('object');
+    expect(response.data).to.deep.equal(expectedMessage);
+  });
+  it('returns a status 200 with a json message with task confirmed', async () => {
+    // Setup
+    const taskIdTest = 1;
+    const confirmMessage = {
+      message: `Task modified with ID: ${taskIdTest}`,
+    };
+    const reqBody = {
+      title: 'test',
+      description: 'test description',
+      deadline: '2023-05-08',
+      isCompleted: false,
+    };
       // Act
-      const response = await axios.delete(`${apiUrl}/delete/889`);
-      // Assert
-      expectResponseStatus(response.status, 200);
-      expect(response.data).to.be.an('object');
-      expect(response.data).to.deep.equal(expectedMessage);
-    });
-    it('returns a status 200 with a json message - deleted task', async () => {
-      // Setup
-      const taskIdTest = 1;
-      const expectedMessage = {
-        message: `Task deleted with ID: ${taskIdTest}`,
-      };
+    const task = await axios.get(`${apiUrl}/${taskIdTest}`);
+    const response = await axios.put(`${apiUrl}/edit/${taskIdTest}`, reqBody);
+    const updatedTask = await axios.get(`${apiUrl}/${taskIdTest}`);
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data).to.deep.equal(confirmMessage);
+    expect(task).to.not.deep.equal(updatedTask);
+  });
+});
+
+describe('DELETE /tasks/delete/:taskId', async () => {
+  it('returns an error 400 with a json message when the task id is not a number', async () => {
+    // Setup
+    const expectedMessage = { message: 'Please provide a valid task ID' };
+    // Act
+    let errorResponse;
+    try {
+      await axios.delete(`${apiUrl}/delete/invalidID`);
+    } catch (error) {
+      errorResponse = error.response;
+    }
+    // Assert
+    expectResponseStatus(errorResponse.status, 400);
+    expect(errorResponse.data).to.be.an('object');
+    expect(errorResponse.data).to.deep.equal(expectedMessage);
+  });
+  it('returns a status 200 with a json message not found task', async () => {
+    // Setup
+    const expectedMessage = {
+      message: 'No task found with the provided ID',
+    };
       // Act
-      const allTasks = await axios.get(`${apiUrl}/all`);
-      const response = await axios.delete(`${apiUrl}/delete/${taskIdTest}`);
-      const allTaskAfterDeletion = await axios.get(`${apiUrl}/all`);
-      // Assert
-      expectResponseStatus(response.status, 200);
-      expect(response.data).to.be.an('object');
-      expect(allTasks).to.not.deep.equal(allTaskAfterDeletion);
-      expect(response.data).to.deep.equal(expectedMessage);
-      expect(allTaskAfterDeletion.data.length).to.equal(
-        allTasks.data.length - 1,
-      );
-    });
+    const response = await axios.delete(`${apiUrl}/delete/889`);
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data).to.be.an('object');
+    expect(response.data).to.deep.equal(expectedMessage);
+  });
+  it('returns a status 200 with a json message - deleted task', async () => {
+    // Setup
+    const taskIdTest = 1;
+    const expectedMessage = {
+      message: `Task deleted with ID: ${taskIdTest}`,
+    };
+      // Act
+    const allTasks = await axios.get(`${apiUrl}/all`);
+    const response = await axios.delete(`${apiUrl}/delete/${taskIdTest}`);
+    const allTaskAfterDeletion = await axios.get(`${apiUrl}/all`);
+    // Assert
+    expectResponseStatus(response.status, 200);
+    expect(response.data).to.be.an('object');
+    expect(allTasks).to.not.deep.equal(allTaskAfterDeletion);
+    expect(response.data).to.deep.equal(expectedMessage);
+    expect(allTaskAfterDeletion.data.length).to.equal(
+      allTasks.data.length - 1,
+    );
   });
 });
