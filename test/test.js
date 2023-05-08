@@ -48,7 +48,7 @@ describe('GET /tasks/pending', () => {
 });
 
 describe('GET /tasks/:taskId', () => {
-  it('returns an error 400 with a json message', async () => {
+  it('returns an error 400 with a json message when the task id is not a number', async () => {
     // Setup
     const expectedMessage = { message: 'Please provide a valid task ID' };
     // Act
