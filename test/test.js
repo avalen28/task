@@ -87,4 +87,43 @@ describe('GET /tasks/:taskId', () => {
     expect(response.data[0]).to.be.an('object');
     expect(response.data[0].id).to.deep.equal(taskId);
   });
+
+  describe('POST /tasks/create', () => {
+    it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
+      // Setup
+      const expectedMessage = { message: 'Please check your fields' };
+      const reqBody = {
+        title: 'test',
+        description: 'test description',
+        deadline: 'false',
+        isCompleted: false,
+      };
+      // Act
+      let errorResponse;
+      try {
+        await axios.post(`${apiUrl}/create`, reqBody);
+      } catch (error) {
+        errorResponse = error.response;
+      }
+      // Assert
+      expectResponseStatus(errorResponse.status, 400);
+      expect(errorResponse.data).to.be.an('object');
+      expect(errorResponse.data).to.deep.equal(expectedMessage);
+    });
+    it('returns a status 201 with a json message', async () => {
+      // Setup
+      const reqBody = {
+        title: 'test',
+        description: 'test description',
+        deadline: '2027-06-03',
+        isCompleted: false,
+      };
+      const expectedMessage = '1 tasks added to DB';
+      // Act
+      const response = await axios.post(`${apiUrl}/create`, reqBody);
+      // Assert
+      expectResponseStatus(response.status, 201);
+      expect(response.data).to.equal(expectedMessage);
+    });
+  });
 });
