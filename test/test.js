@@ -118,12 +118,70 @@ describe('GET /tasks/:taskId', () => {
         deadline: '2027-06-03',
         isCompleted: false,
       };
-      const expectedMessage = '1 tasks added to DB';
+      const expectedMessage = { message: '1 tasks added to DB' };
       // Act
       const response = await axios.post(`${apiUrl}/create`, reqBody);
       // Assert
       expectResponseStatus(response.status, 201);
-      expect(response.data).to.equal(expectedMessage);
+      expect(response.data).to.deep.equal(expectedMessage);
+    });
+  });
+
+  describe('PUT /tasks/edit/:taskId', () => {
+    it('returns an error 400 with a json message when the task id is not a number', async () => {
+      // Setup
+      const expectedMessage = { message: 'Please provide a valid task ID' };
+      // Act
+      let errorResponse;
+      try {
+        await axios.get(`${apiUrl}/invalidID`);
+      } catch (error) {
+        errorResponse = error.response;
+      }
+      // Assert
+      expectResponseStatus(errorResponse.status, 400);
+      expect(errorResponse.data).to.be.an('object');
+      expect(errorResponse.data).to.deep.equal(expectedMessage);
+    });
+    it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
+      // Setup
+      const expectedMessage = { message: 'Please check your fields' };
+      const reqBody = {
+        title: 'test',
+        description: 'test description',
+        deadline: 'false',
+        isCompleted: false,
+      };
+      const taskIdTest = 1;
+      // Act
+      let errorResponse;
+      try {
+        await axios.put(`${apiUrl}/edit/${taskIdTest}`, reqBody);
+      } catch (error) {
+        errorResponse = error.response;
+      }
+      // Assert
+      expectResponseStatus(errorResponse.status, 400);
+      expect(errorResponse.data).to.be.an('object');
+      expect(errorResponse.data).to.deep.equal(expectedMessage);
+    });
+    it('returns a status 200 with a json message not found task', async () => {
+      // Setup
+      const expectedMessage = {
+        message: 'No task found with the provided ID',
+      };
+      const reqBody = {
+        title: 'test',
+        description: 'test description',
+        deadline: '2023-05-08',
+        isCompleted: false,
+      };
+        // Act
+      const response = await axios.put(`${apiUrl}/edit/9999`, reqBody);
+      // Assert
+      expectResponseStatus(response.status, 200);
+      expect(response.data).to.be.an('object');
+      expect(response.data).to.deep.equal(expectedMessage);
     });
   });
 });

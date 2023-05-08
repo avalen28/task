@@ -77,7 +77,9 @@ const createTask = (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
         throw error;
       }
-      res.status(201).send(`${results.rowCount} tasks added to DB`);
+      res
+        .status(201)
+        .json({ message: `${results.rowCount} tasks added to DB` });
     },
   );
 };
@@ -111,7 +113,7 @@ const updateTask = (req, res) => {
           .json({ message: 'No task found with the provided ID' });
         return;
       }
-      res.status(200).send(`Task modified with ID: ${taskId}`);
+      res.status(200).json({ message: `Task modified with ID: ${taskId}` });
     },
   );
 };
@@ -123,7 +125,7 @@ const deleteTask = (req, res) => {
     if (error) {
       throw error;
     }
-    res.status(200).send(`Task deleted with ID: ${taskId}`);
+    res.status(200).json({ message: `Task deleted with ID: ${taskId}` });
   });
 };
 
