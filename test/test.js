@@ -9,6 +9,7 @@ const {
   apiUrl,
   expectResponseStatus,
   validateRequestBody,
+  validateUrlParam,
 } = require('./testUtils');
 
 describe('GET /tasks/test', () => {
@@ -53,19 +54,7 @@ describe('GET /tasks/pending', () => {
 
 describe('GET /tasks/:taskId', () => {
   it('returns an error 400 with a json message when the task id is not a number', async () => {
-    // Setup
-    const expectedMessage = { message: 'Please provide a valid task ID' };
-    // Act
-    let errorResponse;
-    try {
-      await axios.get(`${apiUrl}/invalidID`);
-    } catch (error) {
-      errorResponse = error.response;
-    }
-    // Assert
-    expectResponseStatus(errorResponse.status, 400);
-    expect(errorResponse.data).to.be.an('object');
-    expect(errorResponse.data).to.deep.equal(expectedMessage);
+    validateUrlParam('get');
   });
 
   it('returns a status 200 with a json message not found task', async () => {
@@ -116,19 +105,7 @@ describe('POST /tasks/create', () => {
 
 describe('PUT /tasks/edit/:taskId', () => {
   it('returns an error 400 with a json message when the task id is not a number', async () => {
-    // Setup
-    const expectedMessage = { message: 'Please provide a valid task ID' };
-    // Act
-    let errorResponse;
-    try {
-      await axios.get(`${apiUrl}/invalidID`);
-    } catch (error) {
-      errorResponse = error.response;
-    }
-    // Assert
-    expectResponseStatus(errorResponse.status, 400);
-    expect(errorResponse.data).to.be.an('object');
-    expect(errorResponse.data).to.deep.equal(expectedMessage);
+    validateUrlParam('put');
   });
   it('returns an error 400 with a json message when req.body fields have wrong format', async () => {
     validateRequestBody('put');
@@ -176,19 +153,7 @@ describe('PUT /tasks/edit/:taskId', () => {
 
 describe('DELETE /tasks/delete/:taskId', async () => {
   it('returns an error 400 with a json message when the task id is not a number', async () => {
-    // Setup
-    const expectedMessage = { message: 'Please provide a valid task ID' };
-    // Act
-    let errorResponse;
-    try {
-      await axios.delete(`${apiUrl}/delete/invalidID`);
-    } catch (error) {
-      errorResponse = error.response;
-    }
-    // Assert
-    expectResponseStatus(errorResponse.status, 400);
-    expect(errorResponse.data).to.be.an('object');
-    expect(errorResponse.data).to.deep.equal(expectedMessage);
+    validateUrlParam('delete');
   });
   it('returns a status 200 with a json message not found task', async () => {
     // Setup
