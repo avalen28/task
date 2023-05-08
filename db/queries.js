@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Pool } = require('pg');
+const { reqBodyFielsAreValid } = require('../utils/utils');
 
 const pool = new Pool({
   user: 'postgres',
@@ -63,13 +64,17 @@ const createTask = (req, res) => {
   const {
     title, description, deadline, isCompleted,
   } = req.body;
-
+  if (!reqBodyFielsAreValid(title, description, deadline, isCompleted)) {
+    res.status(400).json({ message: 'Please check your fields' });
+    return;
+  }
   const formattedDeadline = new Date(deadline);
   pool.query(
     'INSERT INTO tasks (title, description, deadline, is_completed) VALUES ($1, $2, $3, $4)',
     [title, description, formattedDeadline, isCompleted],
     (error, results) => {
       if (error) {
+        res.status(500).json({ message: 'Internal server error' });
         throw error;
       }
       res.status(201).send(`${results.rowCount} tasks added to DB`);
