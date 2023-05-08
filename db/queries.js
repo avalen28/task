@@ -121,9 +121,20 @@ const updateTask = (req, res) => {
 // Delete a task
 const deleteTask = (req, res) => {
   const taskId = parseInt(req.params.taskId, 10);
-  pool.query('DELETE FROM tasks WHERE id = $1', [taskId], (error) => {
+  if (Number.isNaN(taskId)) {
+    res.status(400).json({ message: 'Please provide a valid task ID' });
+    return;
+  }
+  pool.query('DELETE FROM tasks WHERE id = $1', [taskId], (error, results) => {
     if (error) {
+      res.status(500).json({ message: 'Internal server error' });
       throw error;
+    }
+    if (results.rowCount === 0) {
+      res
+        .status(200)
+        .json({ message: 'No task found with the provided ID' });
+      return;
     }
     res.status(200).json({ message: `Task deleted with ID: ${taskId}` });
   });

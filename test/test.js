@@ -205,4 +205,52 @@ describe('GET /tasks/:taskId', () => {
       expect(task).to.not.deep.equal(updatedTask);
     });
   });
+  describe('DELETE /tasks/delete/:taskId', async () => {
+    it('returns an error 400 with a json message when the task id is not a number', async () => {
+      // Setup
+      const expectedMessage = { message: 'Please provide a valid task ID' };
+      // Act
+      let errorResponse;
+      try {
+        await axios.delete(`${apiUrl}/delete/invalidID`);
+      } catch (error) {
+        errorResponse = error.response;
+      }
+      // Assert
+      expectResponseStatus(errorResponse.status, 400);
+      expect(errorResponse.data).to.be.an('object');
+      expect(errorResponse.data).to.deep.equal(expectedMessage);
+    });
+    it('returns a status 200 with a json message not found task', async () => {
+      // Setup
+      const expectedMessage = {
+        message: 'No task found with the provided ID',
+      };
+      // Act
+      const response = await axios.delete(`${apiUrl}/delete/889`);
+      // Assert
+      expectResponseStatus(response.status, 200);
+      expect(response.data).to.be.an('object');
+      expect(response.data).to.deep.equal(expectedMessage);
+    });
+    it('returns a status 200 with a json message - deleted task', async () => {
+      // Setup
+      const taskIdTest = 1;
+      const expectedMessage = {
+        message: `Task deleted with ID: ${taskIdTest}`,
+      };
+      // Act
+      const allTasks = await axios.get(`${apiUrl}/all`);
+      const response = await axios.delete(`${apiUrl}/delete/${taskIdTest}`);
+      const allTaskAfterDeletion = await axios.get(`${apiUrl}/all`);
+      // Assert
+      expectResponseStatus(response.status, 200);
+      expect(response.data).to.be.an('object');
+      expect(allTasks).to.not.deep.equal(allTaskAfterDeletion);
+      expect(response.data).to.deep.equal(expectedMessage);
+      expect(allTaskAfterDeletion.data.length).to.equal(
+        allTasks.data.length - 1,
+      );
+    });
+  });
 });
