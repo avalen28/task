@@ -107,7 +107,7 @@ const updateTask = (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
         throw error;
       }
-      if (results.rows.length === 0) {
+      if (results.rowCount === 0) {
         res
           .status(200)
           .json({ message: 'No task found with the provided ID' });

@@ -176,12 +176,33 @@ describe('GET /tasks/:taskId', () => {
         deadline: '2023-05-08',
         isCompleted: false,
       };
-        // Act
+      // Act
       const response = await axios.put(`${apiUrl}/edit/9999`, reqBody);
       // Assert
       expectResponseStatus(response.status, 200);
       expect(response.data).to.be.an('object');
       expect(response.data).to.deep.equal(expectedMessage);
+    });
+    it('returns a status 200 with a json message with task confirmed', async () => {
+      // Setup
+      const taskIdTest = 1;
+      const confirmMessage = {
+        message: `Task modified with ID: ${taskIdTest}`,
+      };
+      const reqBody = {
+        title: 'test',
+        description: 'test description',
+        deadline: '2023-05-08',
+        isCompleted: false,
+      };
+      // Act
+      const task = await axios.get(`${apiUrl}/${taskIdTest}`);
+      const response = await axios.put(`${apiUrl}/edit/${taskIdTest}`, reqBody);
+      const updatedTask = await axios.get(`${apiUrl}/${taskIdTest}`);
+      // Assert
+      expectResponseStatus(response.status, 200);
+      expect(response.data).to.deep.equal(confirmMessage);
+      expect(task).to.not.deep.equal(updatedTask);
     });
   });
 });
